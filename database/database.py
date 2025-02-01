@@ -5,6 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from config import DB_NAME, DB_PASS, DB_USER
 from .models import Base
 
+from redis import Redis
+
 DATABASE_URL = f'postgresql+asyncpg://{DB_USER}:{DB_PASS}@localhost:5432/{DB_NAME}'
 
 
@@ -20,3 +22,6 @@ async def create_db_and_tables():
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         yield session
+
+
+r = Redis(host='localhost', port=6379, db=0)
