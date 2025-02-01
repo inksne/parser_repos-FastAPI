@@ -1,0 +1,233 @@
+{% extends "authenticated.html" %}
+
+{% block styles %}
+    {{ super() }}
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #12161C;
+            font-family: Verdana;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .search-container {
+            margin-top: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .search-container form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .search-container input {
+            padding: 10px;
+            width: 300px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .search-container button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .search-container button:hover {
+            background-color: #45a049;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #loader {
+            display: none;
+        }
+
+        .repo-card {
+            background-color: rgba(0, 0, 0, 0);
+            padding: 15px;
+            margin: 10px;
+            border-radius: 8px;
+            color: #fff;
+            width: 80%;
+            margin-bottom: 20px;
+            position: relative;
+            font-size: 0.9rem;
+            min-height: 130px;
+            max-width: 600px;
+            border: 2px solid #888;
+        }
+
+        .repo-card a {
+            color: #1E90FF;
+            text-decoration: none;
+        }
+
+        .repo-card a:hover {
+            text-decoration: underline;
+        }
+
+        .repo-card .repo-info {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+        }
+
+        .repo-card .repo-info p {
+            margin: 0;
+        }
+
+        .repo-list {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .repo-column {
+            width: 45%;
+            min-width: 300px;
+        }
+
+        .repo-list h2 {
+            color: #fff;
+        }
+
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="search-container">
+        <form id="searchForm">
+            <input type="text" id="query" name="query" placeholder="Введите ключевое слово..." required>
+            <button type="submit">Поиск</button>
+            <div id="loader" class="loader"></div>
+        </form>
+    </div>
+
+    <div class="repo-list" id="repoList"></div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const query = document.getElementById('query').value;
+            
+            if (!query) return;
+
+            document.getElementById('loader').style.display = 'inline-block';
+
+            try {
+                const response = await fetch(`/authenticated/search?query=${query}`);
+                const data = await response.json();
+
+                const repoList = document.getElementById('repoList');
+                repoList.innerHTML = '';
+
+                if (data.github_repos.length > 0 || data.gitlab_repos.length > 0) {
+
+                    const githubColumn = document.createElement('div');
+                    githubColumn.classList.add('repo-column');
+                    
+                    if (data.github_repos.length > 0) {
+                        const githubHeader = document.createElement('h2');
+                        githubHeader.textContent = 'Репозитории с GitHub';
+                        githubColumn.appendChild(githubHeader);
+
+                        data.github_repos.forEach(repo => {
+                            const repoCard = document.createElement('div');
+                            repoCard.classList.add('repo-card');
+                            repoCard.innerHTML = `
+                                <h3><a href="${repo.url}" target="_blank">${repo.name}</a></h3>
+                                <p>Владелец: ${repo.owner_name}</p>
+                                <p>Звезды: ${repo.stars_count}</p>
+                                <p>Язык: ${repo.language || 'Не указан'}</p>
+                                <p>Последнее обновление: ${repo.updated_at}</p>
+                                <div class="repo-info">
+                                    <p>Ветка: ${repo.default_branch}</p>
+                                    <p>Лицензия: ${repo.license ? repo.license.name : 'Не указана'}</p>
+                                    <p>Просмотры: ${repo.watchers_count}</p>
+                                </div>
+                            `;
+                            githubColumn.appendChild(repoCard);
+                        });
+                    }
+
+                    const gitlabColumn = document.createElement('div');
+                    gitlabColumn.classList.add('repo-column');
+                    
+                    if (data.gitlab_repos.length > 0) {
+                        const gitlabHeader = document.createElement('h2');
+                        gitlabHeader.textContent = 'Репозитории с GitLab';
+                        gitlabColumn.appendChild(gitlabHeader);
+
+                        data.gitlab_repos.forEach(repo => {
+                            const repoCard = document.createElement('div');
+                            repoCard.classList.add('repo-card');
+                            repoCard.innerHTML = `
+                                <h3><a href="${repo.url}" target="_blank">${repo.name}</a></h3>
+                                <p>Владелец: ${repo.owner_name}</p>
+                                <p>Звезды: ${repo.stars_count}</p>
+                                <p>Последняя активность: ${repo.last_activity_at}</p>
+                                <div class="repo-info">
+                                    <p>Ветка: ${repo.default_branch}</p>
+                                    <p>Лицензия: ${repo.license && repo.license.name ? repo.license.name : 'Не указана'}</p>
+                                </div>
+                            `;
+                            gitlabColumn.appendChild(repoCard);
+                        });
+                    }
+
+                    repoList.appendChild(githubColumn);
+                    repoList.appendChild(gitlabColumn);
+
+                } else {
+                    repoList.innerHTML = '<p>Не найдено репозиториев по данному запросу.</p>';
+                }
+            } catch (error) {
+                console.error('Ошибка при загрузке данных:', error);
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+            }
+        });
+    </script>
+{% endblock %}
