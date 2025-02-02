@@ -6,14 +6,15 @@ from pathlib import Path
 import os
 import logging
 import pika
+import time
 
 
 load_dotenv()
 
 
-DB_USER = os.environ.get("DB_USER")
-DB_PASS = os.environ.get("DB_PASS")
-DB_NAME = os.environ.get("DB_NAME")
+POSTGRES_USER = os.environ.get("POSTGRES_USER")
+POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
+POSTGRES_DB = os.environ.get("POSTGRES_DB")
 
 GITHUB_ACCESS_TOKEN = os.environ.get("GITHUB_ACCESS_TOKEN")
 GITLAB_ACCESS_TOKEN = os.environ.get("GITLAB_ACCESS_TOKEN")
@@ -42,7 +43,7 @@ settings = Settings()
 
 
 class DBSettings(BaseSettings):
-    db_url: str = f'postgresql+asyncpg://{DB_USER}:{DB_PASS}@localhost:5432/{DB_NAME}'
+    db_url: str = f'postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@postgres:5432/{POSTGRES_DB}'
     db_echo: bool = False
 
 db_settings = DBSettings()
@@ -64,4 +65,11 @@ connection_params = pika.ConnectionParameters(
 
 
 def get_connection() -> pika.BlockingConnection:
-    return pika.BlockingConnection(parameters=connection_params)
+    while True:
+        try:
+            connection = pika.BlockingConnection(connection_params)
+            print('успех!')
+            return connection
+        except pika.exceptions.AMQPConnectionError:
+            print('повтор')
+            time.sleep(5)

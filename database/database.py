@@ -2,12 +2,12 @@ from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from config import DB_NAME, DB_PASS, DB_USER
+from config import POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD
 from .models import Base
 
 from redis import Redis
 
-DATABASE_URL = f'postgresql+asyncpg://{DB_USER}:{DB_PASS}@localhost:5432/{DB_NAME}'
+DATABASE_URL = f'postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@postgres:5432/{POSTGRES_DB}'
 
 
 engine = create_async_engine(DATABASE_URL)
@@ -24,4 +24,4 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
-r = Redis(host='localhost', port=6379, db=0)
+r = Redis(host='redis', port=6379, db=0)

@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 @router.get("/", response_class=HTMLResponse)
 async def base(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request, "index.html")
 
 
 @router.get("/search")
@@ -77,7 +77,7 @@ async def authenticated_search(
 
 @router.get("/authenticated/", response_class=HTMLResponse)
 async def base(request: Request, current_user: User = Depends(get_current_auth_user)):
-    return templates.TemplateResponse("auth_index.html", {"request": request})
+    return templates.TemplateResponse(request, "auth_index.html")
 
 
 @router.get('/about_us', response_class=HTMLResponse)
