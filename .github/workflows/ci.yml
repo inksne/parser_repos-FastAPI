@@ -10,7 +10,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
+
+    env:
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
     
     steps:
       - name: Check out repository
@@ -47,7 +52,7 @@ jobs:
           docker pull inksne/parser-repos-back-image:latest
 
       - name: Run tests
-        run: docker run --rm inksne/parser-repos-back-image pytest -v -s
+        run: docker run -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} --rm inksne/parser-repos-back-image pytest -v -s
 
   # deploy:
   #   runs-on: ubuntu-latest
