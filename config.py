@@ -12,9 +12,9 @@ import time
 load_dotenv()
 
 
-POSTGRES_USER = os.environ.get("POSTGRES_USER")
-POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
-POSTGRES_DB = os.environ.get("POSTGRES_DB")
+POSTGRES_USER = os.environ.get("POSTGRES_USER", "inksne")
+POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "inksne")
+POSTGRES_DB = os.environ.get("POSTGRES_DB", "inksne")
 
 GITHUB_ACCESS_TOKEN = os.environ.get("GITHUB_ACCESS_TOKEN")
 GITLAB_ACCESS_TOKEN = os.environ.get("GITLAB_ACCESS_TOKEN")
