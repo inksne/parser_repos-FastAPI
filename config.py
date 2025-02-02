@@ -23,7 +23,7 @@ RMQ_HOST = os.environ.get("RMQ_HOST", "rabbitmq")
 RMQ_PORT = os.environ.get("RMQ_PORT", "5672")
 RMQ_USER = os.environ.get("RMQ_USER")
 RMQ_PASSWORD = os.environ.get("RMQ_PASSWORD")
-MQ_EXCHANGE = os.environ.get("MQ_EXCHANGE")
+MQ_EXCHANGE = os.environ.get("MQ_EXCHANGE", '')
 MQ_ROUTING_KEY = os.environ.get("MQ_ROUTING_KEY")
 
 
