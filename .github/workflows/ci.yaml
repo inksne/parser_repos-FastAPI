@@ -54,14 +54,14 @@ jobs:
       - name: Run tests
         run: docker run -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} --rm inksne/parser-repos-back-image pytest -v -s
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: test  
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: test  
 
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Check out repository
+  #       uses: actions/checkout@v3
 
-      - name: Set up Docker Compose
-        run: |
-          docker-compose up -d
+  #     - name: Set up Docker Compose
+  #       run: |
+  #         docker-compose up -d
