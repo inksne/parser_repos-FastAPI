@@ -38,7 +38,7 @@ def test_login_user():
         assert "access_token" in tokens
         assert "refresh_token" in tokens
     except AssertionError:
-        asser response.status_code == 400
+        assert response.status_code == 400
 
 
 def test_logout():
